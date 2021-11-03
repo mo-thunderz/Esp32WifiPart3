@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body style='background-color: #EEEEEE;'>
+
+<span style='color: #003366;'>
+
+<h1>LED controller</h1>
+
+<form>
+  <p>Select LED:</p>
+  <div>
+    <input type='radio' id='RADIO_MODE1'
+           name='operation_mode' value='Mode 1'>
+    <label for='RADIO_MODE1'>LED 1</label>
+    <input type='radio' id='RADIO_MODE2'
+           name='operation_mode' value='Mode 2'>
+    <label for='RADIO_MODE2'>LED 2</label>
+    <input type='radio' id='RADIO_MODE3'
+           name='operation_mode' value='Mode 3'>
+    <label for='RADIO_MODE3'>LED 3</label>
+  </div>
+  <div>
+</form>
+<br>
+Set intensity level: <br>
+<input type='range' min='1' max='100' value='50' class='slider' id='LED_intensity'>
+Value: <span id='value'>-</span><br>
+
+</span>
+
+</body>
+<script>
+
+  var slider = document.getElementById('LED_intensity');
+  var output = document.getElementById('value');  
+  
+  document.getElementById('RADIO_MODE1').addEventListener('click', cb_operation_mode);
+  document.getElementById('RADIO_MODE2').addEventListener('click', cb_operation_mode);
+  document.getElementById('RADIO_MODE3').addEventListener('click', cb_operation_mode);
+  slider.addEventListener('click', slider_change);
+  
+  var Socket;
+  function init() {
+    Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
+    Socket.onmessage = function(event) {
+      processCommand(event);
+    };
+  }  
+  
+  function button_send_back() {
+	console.log(slider.value);	
+	var x = slider.value;
+	
+    var msg = {
+	type: 'LED_intensity',
+	value:  x
+	};
+	Socket.send(JSON.stringify(msg));
+  }
+  
+  function slider_change() {
+  	console.log(slider.value);	
+	var x = slider.value;
+	
+	var msg = {
+	  type: 'LED_intensity',
+	  value:  x
+	};
+	Socket.send(JSON.stringify(msg));
+  }
+  
+  function cb_operation_mode() {
+	var LED_select = 0;
+	if(document.getElementById('RADIO_MODE1').checked == true) {   
+      console.log('oen');  
+    } else if(document.getElementById('RADIO_MODE2').checked == true) {    
+	  LED_select = 1;
+    } else {
+	  LED_select = 2;
+	}
+	var msg = {
+	  type: 'LED_select',
+	  value:  LED_select
+	};
+	Socket.send(JSON.stringify(msg));
+  }
+  
+  function processCommand(event) {
+    var obj = JSON.parse(event.data);
+	var type = obj.type;
+	if (type.localeCompare(\"LED_intensity\") == 0) {
+	  var slider_value = obj.value;
+	  console.log(\"successful\");
+	  console.log(slider_value);
+	  output.innerHTML = slider_value;
+	  slider.value = parseInt(slider_value);
+	}
+	if (type.localeCompare(\"LED_select\") == 0) {
+	  var LED_select = parseInt(obj.value);
+	  console.log(\"LED_select\");
+	  console.log(LED_select);
+	  if(LED_select == 0) {
+		console.log(\"mode1\");
+		document.getElementById('RADIO_MODE1').checked = true;
+	  }
+	  else if(LED_select == 1) {
+	    console.log(\"mode2\");
+		document.getElementById('RADIO_MODE2').checked = true;
+	  }
+	  else if(LED_select == 2) {
+	    console.log(\"mode3\");
+		document.getElementById('RADIO_MODE3').checked = true;
+	  }
+	}
+  }
+  
+  window.onload = function(event) {
+    init();
+  }
+
+</script>
+</html>
