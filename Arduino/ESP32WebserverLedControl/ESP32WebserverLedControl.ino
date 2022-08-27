@@ -12,16 +12,18 @@
 // ---------------------------------------------------------------------------------------
 
 #include <WiFi.h>                                     // needed to connect to WiFi
-#include <WebServer.h>                                // needed to create a simple webserver
+#include <WebServer.h>                                // needed to create a simple webserver (make sure tools -> board is set to ESP32, otherwise you will get a "WebServer.h: No such file or directory" error)
 #include <WebSocketsServer.h>                         // needed for instant communication between client and server through Websockets
 #include <ArduinoJson.h>                              // needed for JSON encapsulation (send multiple variables with one string)
 
 // SSID and password of Wifi connection:
-const char* ssid = "TYPE_YOUR_SSID_HERE";
-const char* password = "TYPE_YOUR_PASSWORD_HERE";
+//const char* ssid = "TYPE_YOUR_SSID_HERE";
+//const char* password = "TYPE_YOUR_PASSWORD_HERE";
+#include "WifiPassword.h"
 
 // The String below "webpage" contains the complete HTML code that is sent to the client whenever someone connects to the webserver
-String webpage = "<!DOCTYPE html><html><head><title>Page Title</title></head><body style='background-color: #EEEEEE;'><span style='color: #003366;'><h1>LED Controller</h1><form> <p>Select LED:</p> <div> <input type='radio' id='LED_0' name='operation_mode'> <label for='LED_0'>LED 0</label> <input type='radio' id='LED_1' name='operation_mode'> <label for='LED_1'>LED 1</label> <input type='radio' id='LED_2' name='operation_mode'> <label for='LED_2'>LED 2</label> </div></form><br>Set intensity level: <br><input type='range' min='1' max='100' value='50' class='slider' id='LED_INTENSITY'>Value: <span id='LED_VALUE'>-</span><br></span></body><script> document.getElementById('LED_0').addEventListener('click', led_changed); document.getElementById('LED_1').addEventListener('click', led_changed); document.getElementById('LED_2').addEventListener('click', led_changed); var slider = document.getElementById('LED_INTENSITY'); var output = document.getElementById('LED_VALUE'); slider.addEventListener('click', slider_changed); var Socket; function init() { Socket = new WebSocket('ws://' + window.location.hostname + ':81/'); Socket.onmessage = function(event) { processCommand(event); }; } function led_changed() {var l_LED_selected = 0;if(document.getElementById('LED_1').checked == true) { l_LED_selected = 1;} else if(document.getElementById('LED_2').checked == true) { l_LED_selected = 2;}console.log(l_LED_selected);var msg = { type: 'LED_selected', value: l_LED_selected};Socket.send(JSON.stringify(msg)); } function slider_changed () { var l_LED_intensity = slider.value;console.log(l_LED_intensity);var msg = { type: 'LED_intensity', value: l_LED_intensity};Socket.send(JSON.stringify(msg)); } function processCommand(event) {var obj = JSON.parse(event.data);var type = obj.type;if (type.localeCompare(\"LED_intensity\") == 0) { var l_LED_intensity = parseInt(obj.value); console.log(l_LED_intensity); slider.value = l_LED_intensity; output.innerHTML = l_LED_intensity;}else if(type.localeCompare(\"LED_selected\") == 0) { var l_LED_selected = parseInt(obj.value); console.log(l_LED_selected); if(l_LED_selected == 0) { document.getElementById('LED_0').checked = true; } else if (l_LED_selected == 1) { document.getElementById('LED_1').checked = true; } else if (l_LED_selected == 2) { document.getElementById('LED_2').checked = true; }} } window.onload = function(event) { init(); }</script></html>";
+// NOTE 27.08.2022: I updated in the webpage "slider.addEventListener('click', slider_changed);" to "slider.addEventListener('change', slider_changed);" -> the "change" did not work on my phone.
+String webpage = "<!DOCTYPE html><html><head><title>Page Title</title></head><body style='background-color: #EEEEEE;'><span style='color: #003366;'><h1>LED Controller</h1><form> <p>Select LED:</p> <div> <input type='radio' id='ID_LED_0' name='operation_mode'> <label for='ID_LED_0'>LED 0</label> <input type='radio' id='ID_LED_1' name='operation_mode'> <label for='ID_LED_1'>LED 1</label> <input type='radio' id='ID_LED_2' name='operation_mode'> <label for='ID_LED_2'>LED 2</label> </div></form><br>Set intensity level: <br><input type='range' min='1' max='100' value='50' class='slider' id='LED_INTENSITY'>Value: <span id='LED_VALUE'>-</span><br></span></body><script> document.getElementById('ID_LED_0').addEventListener('click', led_changed); document.getElementById('ID_LED_1').addEventListener('click', led_changed); document.getElementById('ID_LED_2').addEventListener('click', led_changed); var slider = document.getElementById('LED_INTENSITY'); var output = document.getElementById('LED_VALUE'); slider.addEventListener('change', slider_changed); var Socket; function init() { Socket = new WebSocket('ws://' + window.location.hostname + ':81/'); Socket.onmessage = function(event) { processCommand(event); }; } function led_changed() {var l_LED_selected = 0;if(document.getElementById('ID_LED_1').checked == true) { l_LED_selected = 1;} else if(document.getElementById('ID_LED_2').checked == true) { l_LED_selected = 2;}console.log(l_LED_selected); var msg = { type: 'LED_selected', value: l_LED_selected};Socket.send(JSON.stringify(msg)); } function slider_changed () { var l_LED_intensity = slider.value;console.log(l_LED_intensity);var msg = { type: 'LED_intensity', value: l_LED_intensity};Socket.send(JSON.stringify(msg)); } function processCommand(event) {var obj = JSON.parse(event.data); var type = obj.type;if (type.localeCompare(\"LED_intensity\") == 0) { var l_LED_intensity = parseInt(obj.value); console.log(l_LED_intensity); slider.value = l_LED_intensity; output.innerHTML = l_LED_intensity;}else if(type.localeCompare(\"LED_selected\") == 0) { var l_LED_selected = parseInt(obj.value); console.log(l_LED_selected); if(l_LED_selected == 0) { document.getElementById('ID_LED_0').checked = true; } else if (l_LED_selected == 1) { document.getElementById('ID_LED_1').checked = true; } else if (l_LED_selected == 2) { document.getElementById('ID_LED_2').checked = true; }} } window.onload = function(event) { init(); }</script></html>";
 
 // global variables of the LED selected and the intensity of that LED
 int LED_selected = 0;
@@ -38,8 +40,7 @@ const int led_channels[] = {0, 1, 2};
 const int resolution = 8;
 
 // The JSON library uses static memory, so this will need to be allocated:
-StaticJsonDocument<200> doc_tx;                       // provision memory for about 200 characters
-StaticJsonDocument<200> doc_rx;
+// -> in the video I used global variables for "doc_tx" and "doc_rx", however, I now changed this in the code to local variables instead "doc" -> Arduino documentation recomends to use local containers instead of global to prevent data corruption
 
 // Initialization of webserver and websocket
 WebServer server(80);                                 // the server uses port 80 (standard port for websites
@@ -69,9 +70,7 @@ void setup() {
   Serial.println(WiFi.localIP());                     // show IP address that the ESP32 has received from router
   
   server.on("/", []() {                               // define here wat the webserver needs to do
-    server.send(200, "text\html", webpage);           //    -> it needs to send out the HTML string "webpage" to the client
-    // NOTE: if you use Edge or IE, then use:
-    // server.send(200, "text/html", webpage);
+    server.send(200, "text/html", webpage);           //    -> it needs to send out the HTML string "webpage" to the client
   });
   server.begin();                                     // start server
   
@@ -100,7 +99,8 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
       break;
     case WStype_TEXT:                                 // if a client has sent data, then type == WStype_TEXT
       // try to decipher the JSON string received
-      DeserializationError error = deserializeJson(doc_rx, payload);
+      StaticJsonDocument<200> doc;                    // create JSON container 
+      DeserializationError error = deserializeJson(doc, payload);
       if (error) {
         Serial.print(F("deserializeJson() failed: "));
         Serial.println(error.f_str());
@@ -108,8 +108,8 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
       }
       else {
         // JSON string was received correctly, so information can be retrieved:
-        const char* l_type = doc_rx["type"];
-        const int l_value = doc_rx["value"];
+        const char* l_type = doc["type"];
+        const int l_value = doc["value"];
         Serial.println("Type: " + String(l_type));
         Serial.println("Value: " + String(l_value));
 
@@ -139,9 +139,10 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
 // Simple function to send information to the web clients
 void sendJson(String l_type, String l_value) {
     String jsonString = "";                           // create a JSON string for sending data to the client
-    JsonObject object = doc_tx.to<JsonObject>();      // create a JSON Object
+    StaticJsonDocument<200> doc;                      // create JSON container
+    JsonObject object = doc.to<JsonObject>();         // create a JSON Object
     object["type"] = l_type;                          // write data into the JSON object -> I used "type" to identify if LED_selected or LED_intensity is sent and "value" for the actual value
     object["value"] = l_value;
-    serializeJson(doc_tx, jsonString);                // convert JSON object to string
+    serializeJson(doc, jsonString);                // convert JSON object to string
     webSocket.broadcastTXT(jsonString);               // send JSON string to all clients
 }

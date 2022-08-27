@@ -12,36 +12,33 @@
 <form>
   <p>Select LED:</p>
   <div>
-    <input type='radio' id='LED_0'
+    <input type='radio' id='ID_LED_0'
            name='operation_mode'>
-    <label for='LED_0'>LED 0</label>
-    <input type='radio' id='LED_1'
+    <label for='ID_LED_0'>LED 0</label>
+    <input type='radio' id='ID_LED_1'
            name='operation_mode'>
-    <label for='LED_1'>LED 1</label>
-    <input type='radio' id='LED_2'
+    <label for='ID_LED_1'>LED 1</label>
+    <input type='radio' id='ID_LED_2'
            name='operation_mode'>
-    <label for='LED_2'>LED 2</label>
+    <label for='ID_LED_2'>LED 2</label>
   </div>
 </form>
 <br>
 Set intensity level: <br>
-<input type='range' min='1' max='100' value='50' class='slider' id='LED_INTENSITY'>
-Value: <span id='LED_VALUE'>-</span><br>
+<input type='range' min='1' max='100' value='50' class='slider' id='ID_LED_INTENSITY'>
+Value: <span id='ID_LED_INTENSITY'>-</span><br>
 
 </span>
 
 </body>
 <script>
-  document.getElementById('LED_0').addEventListener('click', led_changed);
-  document.getElementById('LED_1').addEventListener('click', led_changed);
-  document.getElementById('LED_2').addEventListener('click', led_changed);
+  document.getElementById('ID_LED_0').addEventListener('click', led_changed);
+  document.getElementById('ID_LED_1').addEventListener('click', led_changed);
+  document.getElementById('ID_LED_2').addEventListener('click', led_changed);
 
-  
-  
-
-  var slider = document.getElementById('LED_INTENSITY');
-  var output = document.getElementById('LED_VALUE');
-  slider.addEventListener('click', slider_changed);
+  var slider = document.getElementById('ID_LED_INTENSITY');
+  var output = document.getElementById('ID_LED_INTENSITY');
+  slider.addEventListener('change', slider_changed);
 
   var Socket;
   
@@ -54,9 +51,9 @@ Value: <span id='LED_VALUE'>-</span><br>
   
   function led_changed() {
 	var l_LED_selected = 0;
-	if(document.getElementById('LED_1').checked == true) {
+	if(document.getElementById('ID_LED_1').checked == true) {
 	  l_LED_selected = 1;
-	} else if(document.getElementById('LED_2').checked == true) {
+	} else if(document.getElementById('ID_LED_2').checked == true) {
 	  l_LED_selected = 2;
 	}
 	console.log(l_LED_selected);
@@ -84,11 +81,11 @@ Value: <span id='LED_VALUE'>-</span><br>
 	  var l_LED_selected = parseInt(obj.value); 
 	  console.log(l_LED_selected); 
 	  if(l_LED_selected == 0) { 
-	    document.getElementById('LED_0').checked = true; 
+	    document.getElementById('ID_LED_0').checked = true; 
       } else if (l_LED_selected == 1) { 
-	    document.getElementById('LED_1').checked = true; 
+	    document.getElementById('ID_LED_1').checked = true; 
 	  } else if (l_LED_selected == 2) { 
-	    document.getElementById('LED_2').checked = true; 
+	    document.getElementById('ID_LED_2').checked = true; 
 	  }
 	} 
   }
