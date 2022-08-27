@@ -6,3 +6,6 @@ The code allows user to switch between three LEDs and set the intensity of the L
 For installation, the following libraries need to be installed:
 * Websockets by Markus Sattler (can be tricky to find -> search for "Arduino Websockets")
 * ArduinoJson by Benoit Blanchon
+
+# Updates
+* 27.08.2022: Changed slider listening event from "click" to "change" -> this was needed to make the website work properly on Android phones
