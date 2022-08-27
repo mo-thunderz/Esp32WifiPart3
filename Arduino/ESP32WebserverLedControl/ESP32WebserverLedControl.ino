@@ -17,9 +17,8 @@
 #include <ArduinoJson.h>                              // needed for JSON encapsulation (send multiple variables with one string)
 
 // SSID and password of Wifi connection:
-//const char* ssid = "TYPE_YOUR_SSID_HERE";
-//const char* password = "TYPE_YOUR_PASSWORD_HERE";
-#include "WifiPassword.h"
+const char* ssid = "TYPE_YOUR_SSID_HERE";
+const char* password = "TYPE_YOUR_PASSWORD_HERE";
 
 // The String below "webpage" contains the complete HTML code that is sent to the client whenever someone connects to the webserver
 // NOTE 27.08.2022: I updated in the webpage "slider.addEventListener('click', slider_changed);" to "slider.addEventListener('change', slider_changed);" -> the "change" did not work on my phone.
