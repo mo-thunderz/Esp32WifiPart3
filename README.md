@@ -9,3 +9,12 @@ For installation, the following libraries need to be installed:
 
 # Updates
 * 27.08.2022: Changed slider listening event from "click" to "change" -> this was needed to make the website work properly on Android phones
+
+# How to use:
+Please refer to the following Youtube video:
+https://youtu.be/ZJnXKD0LqDo
+
+
+Have fun ;-)
+
+mo thunderz
