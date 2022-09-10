@@ -26,7 +26,7 @@
 <br>
 Set intensity level: <br>
 <input type='range' min='1' max='100' value='50' class='slider' id='ID_LED_INTENSITY'>
-Value: <span id='ID_LED_INTENSITY'>-</span><br>
+Value: <span id='ID_LED_INTENSITY_VALUE'>-</span><br>
 
 </span>
 
@@ -37,7 +37,7 @@ Value: <span id='ID_LED_INTENSITY'>-</span><br>
   document.getElementById('ID_LED_2').addEventListener('click', led_changed);
 
   var slider = document.getElementById('ID_LED_INTENSITY');
-  var output = document.getElementById('ID_LED_INTENSITY');
+  var output = document.getElementById('ID_LED_INTENSITY_VALUE');
   slider.addEventListener('change', slider_changed);
 
   var Socket;
